@@ -1,4 +1,4 @@
-import React, { useState } from 'react'
+import { useState } from 'react'
 import {
   Box,
   Button,
@@ -53,7 +53,7 @@ export default function Home() {
       const result = await fetchAccessGranted()
       setMessage({
         type: 'success',
-        text: `Found ${result.protectedData.length} protected data items and ${result.accessGranted.length} access grants`,
+        text: `Found ${result.protectedData.length} protected data items and ${result.accessGranted.grantedAccess.length} access grants`,
       })
     } catch (error) {
       setMessage({
