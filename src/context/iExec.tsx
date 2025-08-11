@@ -17,7 +17,7 @@ import {
   RevokedAccess,
 } from "@iexec/dataprotector";
 import { useAccount, useSwitchChain } from "wagmi";
-import { useWallets } from "@privy-io/react-auth";
+import { getEmbeddedConnectedWallet, useWallets } from "@privy-io/react-auth";
 import { IEXEC_HF_ADDRESS } from "@/utils/custom";
 import { iexecSidechain } from "@/components/config/wallet.config";
 
@@ -65,6 +65,7 @@ export function IexecContextProvider({ children }: { children: ReactNode }) {
   const { address, isConnected } = useAccount();
   const { wallets } = useWallets();
   const { switchChain } = useSwitchChain();
+  const embeddedWallet = getEmbeddedConnectedWallet(wallets);
 
   useEffect(() => {
     if (isConnected && address && !isInitializing) {
@@ -88,17 +89,14 @@ export function IexecContextProvider({ children }: { children: ReactNode }) {
 
       if (!isConnected || !address) return;
 
-      const connectedWallet = wallets.find(
-        (w) => w.address.toLowerCase() === address.toLowerCase()
-      );
-      if (!connectedWallet) {
-        console.log("No wallet found for address:", address);
+      if (!embeddedWallet) {
+        console.log("No embedded wallet found for address:", address);
         return;
       }
 
       await switchToIExecNetwork();
-      
-      const provider = await connectedWallet.getEthereumProvider();
+
+      const provider = await embeddedWallet.getEthereumProvider();
       const initializedSdk = new IExecDataProtector(provider);
       setDataProtector(initializedSdk);
     } catch (error) {
@@ -114,16 +112,8 @@ export function IexecContextProvider({ children }: { children: ReactNode }) {
         throw new Error("DataProtector not initialized");
       }
 
-      const connectedWallet = wallets.find(
-        (w) => w.address.toLowerCase() === address?.toLowerCase()
-      );
-      if (!connectedWallet) {
-        throw new Error("No wallet connected");
-      }
-
       await switchToIExecNetwork();
-      
-      const provider = await connectedWallet.getEthereumProvider();
+
       const saveEmail = await dataProtector.core.protectData({
         name: "my-email",
         data: {

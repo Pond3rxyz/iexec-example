@@ -7,10 +7,10 @@ import { CacheProvider, EmotionCache } from "@emotion/react";
 import { ThemeSettings } from "@/theme/Theme";
 import createEmotionCache from "@/createEmotionCache";
 import { PrivyProvider } from "@privy-io/react-auth";
-import { WagmiProvider } from "@privy-io/wagmi";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import { IexecContextProvider } from "@/context/iExec";
-import { privyConfig, wagmiConfig } from "@/components/config/wallet.config";
+import { privyConfig } from "@/components/config/wallet.config";
+import ClientWagmiProvider from "@/components/wagmi/ClientWagmiProvider";
 
 const clientSideEmotionCache = createEmotionCache();
 const queryClient = new QueryClient();
@@ -33,7 +33,7 @@ const MyApp = (props: MyAppProps) => {
       appId={process.env.NEXT_PUBLIC_PRIVY_APP_ID || ""}
     >
       <QueryClientProvider client={queryClient}>
-        <WagmiProvider config={wagmiConfig}>
+        <ClientWagmiProvider>
           <CacheProvider value={emotionCache}>
             <Head>
               <meta
@@ -49,7 +49,7 @@ const MyApp = (props: MyAppProps) => {
               </IexecContextProvider>
             </ThemeProvider>
           </CacheProvider>
-        </WagmiProvider>
+        </ClientWagmiProvider>
       </QueryClientProvider>
     </PrivyProvider>
   );
